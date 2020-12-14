@@ -126,6 +126,8 @@ graphing <- function(solution, setting) {
   }
 }
 
+# R shiny
+{
 ui <- fluidPage(
   numericInput("c", "Value for c:", "", min = 0, width = "10%"),
   numericInput("d", "Value for d:", "", min = 0, width = "10%"),
@@ -167,3 +169,4 @@ server <- function(input, output){
 }
 
 shinyApp(ui = ui, server = server)
+}
