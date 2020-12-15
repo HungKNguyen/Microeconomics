@@ -333,12 +333,13 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                     )
                  )),
                  
-                 tabPanel("Producer",
+                  tabPanel("Producer",
                           helpText(h4("Coming Soon"))
                           ),
                  
                  tabPanel("Market",
-                          helpText(h4("Coming Soon")))
+                          helpText(h4("Coming Soon"))
+                          )
 )
 
 server <- function(input, output, session) {
