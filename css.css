@@ -1,0 +1,9 @@
+#minI, #maxI {
+  -moz-appearance:textfield;
+}
+
+#minI, #maxI::-webkit-outer-spin-button,
+#minI, #maxI::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

@@ -4,6 +4,9 @@ library(shiny)
 library(plotly)
 
 #Function construction
+x_sol <- 6.25 # Base solution
+y_sol <- 6.25
+
 setting <- function (a, Px, Py, I, seed_x, seed_y, hick, newPx, newI) {
   list("c" = a,"d" = 1-a,"Px" = c(Px, newPx),"Py" = Py,"I" = c(I, newI),"seed" = c(seed_x,seed_y),"hick" = hick)
 }
@@ -31,7 +34,14 @@ consummer_optimization <- function(setting) {
   
   switch(setting$hick[1],
     "NA" = {
-    text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3), ". Check the graph if the solution is appropriate.")
+    # text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3), ". Check the graph if the solution is appropriate.")
+    
+    text <- paste(withMathJax(
+              sprintf(
+                "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). Solution: X = %s, y = %s",
+                setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
+              )
+            ))
     
     mylist <- list( "solution" = c(x_sol, y_sol), "text" = text)
     
@@ -188,52 +198,112 @@ graphing <- function(solution, setting) {
                      x = 0.5,
                      y= -0.25)
                 ),
-      xaxis= list(title = "Quantity of Product X"),
-      title = "Graphical Solution for Consumer Optimization")
+      xaxis= list(title = "Quantity of Product X"))
 }
 
 # R shiny
 
 ui <- navbarPage("MicroEconomics by Luke and Hung",
                  tabPanel("Consumer", fluidPage(
+                   
+                   tags$head(
+                     tags$link(rel = "stylesheet", type = "text/css", href = "css.css")
+                   ),
+                   
                    titlePanel("Utility Maximization: Cobb-Douglas & Compensated Demands"),
                    
-                   sidebarLayout(
-                     sidebarPanel(
-                       tags$h4("Utility Maximization & Constraint"),
-                       withMathJax(),
-                       helpText("Utility  \\(u(x,y)=x^\\alpha y^{1-\\alpha}\\)"),
-                       sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .5, step = 0.005),
-                       
-                       helpText("Budget  \\(I=P_x\\cdot x+P_y\\cdot y\\)"),
-                       numericInput(inputId = "minI", value = 0, label = "Min I"),
-                       numericInput(inputId = "maxI", value = 250, label = "Max I"),
-                       sliderInput("I", "I:",min = 0, max = 250, value = 250),
-                       
-                       numericInput(inputId = "minPx", value = 0, label = "Min \\(P_x\\)"),
-                       numericInput(inputId = "maxPx", value = 20, label = "Max \\(P_x\\)"),
-                       sliderInput("Px", "\\(P_x\\):",min = 0, max = 20, value = 20),
-                       
-                       numericInput(inputId = "minPy", value = 0, label = "Min \\(P_y\\)"),
-                       numericInput(inputId = "maxPy", value = 20, label = "Max \\(P_y\\)"),
-                       sliderInput("Py", "\\(P_y\\):",min = 0, max = 20, value = 20),
-                       
-                       
-                       tags$h4("Compensated Demand"),
-                       selectInput("hick", "Draw Income and Substitution Effect (Optional):", c("NA" = "NA", "Hicksian" = "Hicksian", "Slutsky" = "Slutsky")),
-                       numericInput("newPx", "Price of x for compensated demand:", 0, min = 0),
-                       numericInput("newI", "Consumer's Income for compensated demand:", 0, min = 0),
-                       
-                       tags$h4("Advanced"),
-                       numericInput("seed_x", "Seed value for x: ", 1, min = 0),
-                       numericInput("seed_y", "Seed value for y: ", 1, min = 0)
-                     ),
-                     
-                     mainPanel(
-                       plotlyOutput("graph"),
-                       textOutput("result")
-                     )
-                   )
+                   fluidRow(
+                      column(5, 
+                       tabsetPanel(type = "tabs",
+                          tabPanel("Utility Maximization & Constraint", align = "center",
+                             withMathJax(),
+                             helpText(h4("Utility  \\(u(x,y)=x^\\alpha y^{1-\\alpha}\\)")),
+                             sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .5, step = 0.005),
+                             
+                             br(),
+                             
+                             helpText(h4("Budget  \\(I=P_x\\cdot x+P_y\\cdot y\\)")),
+                             
+                             
+                             fluidRow(
+                               column(3,
+                                  numericInput(inputId = "minI", value = 0, label = "Min")
+                                ),
+                               column(6,
+                                  sliderInput("I", "I:",min = 0, max = 250, value = 250)    
+                                ),
+                               column(3,
+                                  numericInput(inputId = "maxI", value = 250, label = "Max")   
+                                )
+                             ),
+                            
+                             fluidRow(
+                               column(3,
+                                      numericInput(inputId = "minPx", value = 0, label = "Min \\(P_x\\)")
+                               ),
+                               column(6,
+                                      sliderInput("Px", "\\(P_x\\):",min = 0, max = 20, value = 20)    
+                               ),
+                               column(3,
+                                      numericInput(inputId = "maxPx", value = 20, label = "Max \\(P_x\\)")   
+                               )
+                             ),
+                             
+                             fluidRow(
+                               column(3,
+                                      numericInput(inputId = "minPy", value = 0, label = "Min \\(P_y\\)")
+                               ),
+                               column(6,
+                                      sliderInput("Py", "\\(P_y\\):",min = 0, max = 20, value = 20)   
+                               ),
+                               column(3,
+                                      numericInput(inputId = "maxPy", value = 20, label = "Max \\(P_y\\)") 
+                               )
+                             )
+                          ),
+                          
+                          tabPanel("Compensated Demand", align = "center",
+                             selectInput("hick", "Draw Income and Substitution Effect (Optional):", c("NA" = "NA", "Hicksian" = "Hicksian", "Slutsky" = "Slutsky")),
+                             
+                             br(),
+                             
+                             helpText(h4("New Budget  \\(I'=P'_x\\cdot x+P_y\\cdot y\\)")),
+                             
+                             fluidRow(
+                               column(3,
+                                      numericInput(inputId = "minNewPx", value = 0, label = "Min \\(P'_x\\)")
+                               ),
+                               column(6,
+                                      sliderInput("NewPx", "\\(P'_x\\):",min = 0, max = 40, value = 40)
+                               ),
+                               column(3,
+                                      numericInput(inputId = "maxNewPx", value = 40, label = "Max \\(P_x\\)")   
+                               )
+                             ),
+                             
+                             fluidRow(
+                               column(3,
+                                      numericInput(inputId = "minNewI", value = 0, label = "Min New I")
+                               ),
+                               column(6,
+                                      sliderInput("NewI", "\\(I'\\):",min = 0, max = 250, value = 40)  
+                               ),
+                               column(3,
+                                      numericInput(inputId = "maxNewI", value = 250, label = "Max New I")   
+                               )
+                             )
+                          )
+                        )
+                      ),
+                      
+                      column(7,
+                        br(),
+                        br(),
+                        br(),
+                        plotlyOutput("graph"),
+                        textOutput("result")
+                      )
+                    )
                  )),
                  
                  tabPanel("Producer"),
@@ -260,10 +330,20 @@ server <- function(input, output, session) {
     updateSliderInput(session, "Py", value = maxPy,
                       min = minPy, max = maxPy, step = 1)
     
+    minNewPx <- input$minNewPx
+    maxNewPx <- input$maxNewPx
+    updateSliderInput(session, "NewPx", value = maxNewPx,
+                      min = minNewPx, max = maxNewPx, step = 1)
+    
+    minNewI <- input$minNewI
+    maxNewI <- input$maxNewI
+    updateSliderInput(session, "NewI", value = maxNewI,
+                      min = minNewI, max = maxNewI, step = 1)
+    
   })
   
   settingA <- reactive({ 
-    setting(input$alpha,input$Px,input$Py,input$I,input$seed_x,input$seed_y,input$hick,input$newPx,input$newI)
+    setting(input$alpha,input$Px,input$Py,input$I, x_sol, y_sol,input$hick,input$NewPx,input$NewI)
   })
   
   A <- reactive({
