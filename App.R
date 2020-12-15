@@ -36,12 +36,13 @@ consummer_optimization <- function(setting) {
     "NA" = {
     # text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3), ". Check the graph if the solution is appropriate.")
     
-    text <- paste(withMathJax(
-              sprintf(
+    withMathJax()
+    
+    text <- sprintf(
                 "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). Solution: X = %s, y = %s",
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
               )
-            ))
+            
     
     mylist <- list( "solution" = c(x_sol, y_sol), "text" = text)
     
