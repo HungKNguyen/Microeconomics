@@ -41,7 +41,7 @@ consummer_optimization <- function(setting) {
     text <- HTML(sprintf(
          "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
           <h4>Solution:</h4> 
-          \\(x = %s \\qquad y = %s\\)",
+          \\(x = %s \\qquad y = %s\\) <br/> <br/> <br/> <br/> <br/>",
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
               ))
             
@@ -78,7 +78,7 @@ consummer_optimization <- function(setting) {
           \\(Income \\ Effect \\ x = %s\\) <br/>
           \\(Substitution \\ Effect \\ x = %s\\) <br/>
           \\(Income \\ Effect \\ y = %s\\) <br/>
-          \\(Substitution \\ Effect \\ y = %s\\)",
+          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/> <br/> <br/>",
          setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
          round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
          round(hick_x, digits = 3), round(hick_y, digits = 3),
@@ -125,7 +125,7 @@ consummer_optimization <- function(setting) {
           \\(Income \\ Effect \\ x = %s\\) <br/>
           \\(Substitution \\ Effect \\ x = %s\\) <br/>
           \\(Income \\ Effect \\ y = %s\\) <br/>
-          \\(Substitution \\ Effect \\ y = %s\\)",
+          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/> <br/> <br/>",
         setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
         round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
         round(ssky_x, digits = 3), round(ssky_y, digits = 3),
@@ -328,9 +328,6 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                       ),
                       
                       column(7,
-                        br(),
-                        br(),
-                        br(),
                         plotlyOutput("graph"),
                         uiOutput("result")
                       )
