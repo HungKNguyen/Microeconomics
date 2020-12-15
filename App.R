@@ -140,7 +140,7 @@ consummer_optimization <- function(setting) {
   )
 }
 
-graphing <- function(solution, setting) {
+graphing <- function(solution, setting, x_scale, y_scale) {
   
   u = solution[1]^setting$c[1]*solution[2]^setting$d[1]
   
@@ -176,11 +176,11 @@ graphing <- function(solution, setting) {
     sskyUltility = function(x){(sskyU/(x^(setting$c[1])))^(1/(setting$d[1]))}
   }
   
-  x_intercept <- max(c(setting$I[1]/setting$Px[1], setting$I[2]/setting$Px[2] + solution[5]*0, solution[5]), na.rm = TRUE)*1.2
-  y_intercept <- max(c(setting$I[1]/setting$Py[1], setting$I[2]/setting$Py[1] + solution[6]*0, solution[6]), na.rm = TRUE)*1.2
+  # x_intercept <- max(c(setting$I[1]/setting$Px[1], setting$I[2]/setting$Px[2] + solution[5]*0, solution[5]), na.rm = TRUE)*1.2
+  # y_intercept <- max(c(setting$I[1]/setting$Py[1], setting$I[2]/setting$Py[1] + solution[6]*0, solution[6]), na.rm = TRUE)*1.2
     
     #Create dataframe
-    x <- seq(from = 0, to = x_intercept, length.out = 10000)
+    x <- seq(from = 0, to = x_scale, length.out = 10000)
     budgetline <- budget(x)
     indiffcurve <- ultility(x)
     switch(setting$hick[1],
@@ -223,7 +223,7 @@ graphing <- function(solution, setting) {
       fig <- fig %>% add_trace(x = ~c(round(solution[5], digits =3)), y = ~c(round(solution[6], digits =3)), name = "Slutsky's Decomposition", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE)
     }
     fig <- fig %>% layout(
-      yaxis = list(title = "Quantity of Product Y", range = c(0,y_intercept )),
+      yaxis = list(title = "Quantity of Product Y", range = c(0,y_scale)),
       legend = (list(orientation = 'h',
                      xanchor = "center",
                      x = 0.5,
@@ -383,7 +383,17 @@ server <- function(input, output, session) {
   
   text <- reactive({ A()$text })
   
-  graph <- reactive({ graphing(A()$solution, settingA()) })
+  x_scale <- reactive({
+    max(c(input$maxI/(input$minPx+1), input$maxI/(input$minNewPx+1),
+          input$maxNewI/(input$minPx+1), input$maxNewI/(input$minNewPx+1),
+          input$I*12/input$Px, input$NewI*12/input$Px,
+          input$I*12/input$NewPx, input$NewI*12/input$NewPx))/12
+  })
+  y_scale <- reactive({
+    max(c(input$maxI/(input$minPy+1), input$maxNewI/(input$minPy+1),
+          input$I*12/input$Py, input$NewI*12/input$Py))/12
+  })
+  graph <- reactive({ graphing(A()$solution, settingA(), x_scale(), y_scale()) })
   
   output$graph <- renderPlotly({graph()})
   
