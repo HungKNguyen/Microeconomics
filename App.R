@@ -36,12 +36,12 @@ consummer_optimization <- function(setting) {
     "NA" = {
     # text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3), ". Check the graph if the solution is appropriate.")
     
-    withMathJax()
     
-    text <- sprintf(
-                "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). Solution: X = %s, y = %s",
+    
+    text <- HTML(sprintf(
+                "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s\\).",
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
-              )
+              ))
             
     
     mylist <- list( "solution" = c(x_sol, y_sol), "text" = text)
@@ -66,11 +66,12 @@ consummer_optimization <- function(setting) {
        hick_x = (u/(alpha^setting$d[1]))^(1/(setting$d[1]+setting$c[1]))
        hick_y = alpha * hick_x
        
-       text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3),
-                     ". New X equals to ", round(newX_sol, digits =3), "New Y equals to ", round(newY_sol, digits = 3),
-                     ". Substitution effect for x ", round(hick_x - x_sol, digits =3), ", for y ", round(hick_y - y_sol, digits= 3),
-                     ". Income effect for x ", round(newX_sol - hick_x, digits =3), ", for y ", round(newY_sol - hick_y, digits =3),
-                     ". Check the graph if the solution is appropriate.")
+       text <- HTML(sprintf(
+         "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s, \\ x' = %s, \\ y' = %s, \\ x_{hick} = %s, \\ y_{hick} = %s\\).",
+         setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
+         round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
+         round(hick_x, digits = 3), round(hick_y, digits = 3)
+       ))
        
        mylist <- list( "solution" = c(x_sol,y_sol, newX_sol, newY_sol, hick_x, hick_y), "text" = text)
        
@@ -99,11 +100,12 @@ consummer_optimization <- function(setting) {
       ssky_x = ssky_solution$pars[1]
       ssky_y = ssky_solution$pars[2]
       
-      text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3),
-                    ". New X equals to ", round(newX_sol, digits =3), "New Y equals to ", round(newY_sol, digits = 3),
-                    ". Substitution effect for x ", round(ssky_x - x_sol, digits =3), ", for y ", round(ssky_y - y_sol, digits= 3),
-                    ". Income effect for x ", round(newX_sol - ssky_x, digits =3), ", for y ", round(newY_sol - ssky_y, digits =3),
-                    ". Check the graph if the solution is appropriate.")
+      text <- HTML(sprintf(
+        "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s, \\ x' = %s, \\ y' = %s, \\ x_{slutsky} = %s, y_{slutsky} = %s\\).",
+        setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
+        round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
+        round(ssky_x, digits = 3), round(ssky_y, digits = 3)
+      ))
       
       mylist <- list( "solution" = c(x_sol,y_sol, newX_sol, newY_sol, ssky_x, ssky_y), "text" = text)
     }
@@ -302,7 +304,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                         br(),
                         br(),
                         plotlyOutput("graph"),
-                        textOutput("result")
+                        uiOutput("result")
                       )
                     )
                  )),
@@ -355,9 +357,12 @@ server <- function(input, output, session) {
   
   graph <- reactive({ graphing(A()$solution, settingA()) })
   
-  output$result <- renderText({text()})
-  
   output$graph <- renderPlotly({graph()})
+  
+  output$result <- renderUI({
+    withMathJax(
+      text()
+    )})
 }
 
 shinyApp(ui = ui, server = server)
