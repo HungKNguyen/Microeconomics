@@ -39,7 +39,9 @@ consummer_optimization <- function(setting) {
     
     
     text <- HTML(sprintf(
-                "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s\\).",
+         "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
+          <h4>Solution:</h4> 
+          \\(x = %s \\qquad y = %s\\)",
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
               ))
             
@@ -67,10 +69,23 @@ consummer_optimization <- function(setting) {
        hick_y = alpha * hick_x
        
        text <- HTML(sprintf(
-         "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s, \\ x' = %s, \\ y' = %s, \\ x_{hick} = %s, \\ y_{hick} = %s\\).",
+         "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
+          <h4>Solution:</h4> 
+          \\(x = %s \\qquad y = %s\\) <br/> 
+          \\(x' = %s \\qquad y' = %s \\) <br/> 
+          \\(x_{Hick} = %s \\qquad y_{Hick} = %s\\) <br/> <br/>
+          <h4>Decomposition</h4>
+          \\(Income \\ Effect \\ x = %s\\) <br/>
+          \\(Substitution \\ Effect \\ x = %s\\) <br/>
+          \\(Income \\ Effect \\ y = %s\\) <br/>
+          \\(Substitution \\ Effect \\ y = %s\\)",
          setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
          round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
-         round(hick_x, digits = 3), round(hick_y, digits = 3)
+         round(hick_x, digits = 3), round(hick_y, digits = 3),
+         round(newX_sol-hick_x, digits = 3),
+         round(newY_sol-hick_y, digits = 3),
+         round(-x_sol+hick_x, digits = 3),
+         round(-y_sol+hick_y, digits = 3)
        ))
        
        mylist <- list( "solution" = c(x_sol,y_sol, newX_sol, newY_sol, hick_x, hick_y), "text" = text)
@@ -101,10 +116,23 @@ consummer_optimization <- function(setting) {
       ssky_y = ssky_solution$pars[2]
       
       text <- HTML(sprintf(
-        "Maximize \\(u = x^{%s}y^{%s}\\) with constraint \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> Solution: \\(x = %s, \\ y = %s, \\ x' = %s, \\ y' = %s, \\ x_{slutsky} = %s, y_{slutsky} = %s\\).",
+        "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
+          <h4>Solution:</h4> 
+          \\(x = %s \\qquad y = %s\\) <br/> 
+          \\(x' = %s \\qquad y' = %s \\) <br/> 
+          \\(x_{Slutsky} = %s \\qquad y_{Slutsky} = %s\\) <br/> <br/>
+          <h4>Decomposition</h4>
+          \\(Income \\ Effect \\ x = %s\\) <br/>
+          \\(Substitution \\ Effect \\ x = %s\\) <br/>
+          \\(Income \\ Effect \\ y = %s\\) <br/>
+          \\(Substitution \\ Effect \\ y = %s\\)",
         setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
         round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
-        round(ssky_x, digits = 3), round(ssky_y, digits = 3)
+        round(ssky_x, digits = 3), round(ssky_y, digits = 3),
+        round(newX_sol-ssky_x, digits = 3),
+        round(newY_sol-ssky_y, digits = 3),
+        round(-x_sol+ssky_x, digits = 3),
+        round(-y_sol+ssky_y, digits = 3)
       ))
       
       mylist <- list( "solution" = c(x_sol,y_sol, newX_sol, newY_sol, ssky_x, ssky_y), "text" = text)
