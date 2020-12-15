@@ -45,7 +45,6 @@ consummer_optimization <- function(setting) {
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
               ))
             
-    
     mylist <- list( "solution" = c(x_sol, y_sol), "text" = text)
     
     return(mylist)
@@ -334,9 +333,12 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                     )
                  )),
                  
-                 tabPanel("Producer"),
+                 tabPanel("Producer",
+                          helpText(h4("Coming Soon"))
+                          ),
                  
-                 tabPanel("Market")
+                 tabPanel("Market",
+                          helpText(h4("Coming Soon")))
 )
 
 server <- function(input, output, session) {
