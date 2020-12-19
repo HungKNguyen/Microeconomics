@@ -1,42 +1,19 @@
-library(Rsolnp)
-library(tidyverse)
 library(shiny)
 library(plotly)
 
 #Function construction
-x_sol <- 6.25 # Base solution
-y_sol <- 6.25
 
-setting <- function (a, Px, Py, I, seed_x, seed_y, hick, newPx, newI) {
-  list("c" = a,"d" = 1-a,"Px" = c(Px, newPx),"Py" = Py,"I" = c(I, newI),"seed" = c(seed_x,seed_y),"hick" = hick)
+setting <- function(a, Px, Py, I, hick, newPx, newI) {
+  list("c" = a,"d" = 1-a,"Px" = c(Px, newPx),"Py" = Py,"I" = c(I, newI),"hick" = hick)
 }
 
 consummer_optimization <- function(setting) {
-  # Utility function u(x,y) = x^c*y^d
   
-  ufn <- function(x) { 
-    -x[1]^setting$c[1]*x[2]^setting$d[1]
-  }
-  
-  # Budget Constraint
-  
-  minI <- 0 # Don't change, income always more than 0
-  
-  bline <- function(x){
-    setting$I[1] = x[1]*setting$Px[1] + x[2]*setting$Py[1] # Budget line
-    return(c(setting$I[1]))
-  }
-  
-  solution <- solnp(c(setting$seed[1], setting$seed[2]), fun = ufn, ineqfun = bline, ineqLB = minI, ineqUB=setting$I[1], LB = c(0,0))
-  
-  x_sol <- solution$pars[1]
-  y_sol <- solution$pars[2]
+  x_sol <- (setting$I[1]*setting$c[1])/setting$Px[1]
+  y_sol <- (setting$I[1]*setting$c[1])/setting$Py[1]
   
   switch(setting$hick[1],
     "NA" = {
-    # text <- paste("X equals to ", round(x_sol, digits = 3), " Y equals to ", round(y_sol, digits = 3), ". Check the graph if the solution is appropriate.")
-    
-    
     
     text <- HTML(sprintf(
          "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
@@ -50,15 +27,9 @@ consummer_optimization <- function(setting) {
     return(mylist)
   },
     "Hicksian" = {
-       new_bline <- function(x){
-       setting$I[2] = x[1]*setting$Px[2] + x[2]*setting$Py[1] # New Budget line
-       return(c(setting$I[2]))
-        }
-     
-       new_solution <- solnp(c(setting$seed[1], setting$seed[2]), fun = ufn, ineqfun = new_bline, ineqLB = minI, ineqUB=setting$I[2], LB = c(0,0))
-       
-       newX_sol = new_solution$pars[1]
-       newY_sol = new_solution$pars[2]
+      
+       newX_sol = (setting$I[2]*setting$c[1])/setting$Px[2]
+       newY_sol = (setting$I[2]*setting$c[1])/setting$Py[1]
        
        u = x_sol^setting$c[1]*y_sol^setting$d[1]
        
@@ -92,27 +63,14 @@ consummer_optimization <- function(setting) {
        return(mylist)
       },
     "Slutsky" ={
-      new_bline <- function(x){
-        setting$I[2] = x[1]*setting$Px[2] + x[2]*setting$Py[1] # New Budget line
-        return(c(setting$I[2]))
-      }
       
-      new_solution <- solnp(c(setting$seed[1], setting$seed[2]), fun = ufn, ineqfun = new_bline, ineqLB = minI, ineqUB=setting$I[2], LB = c(0,0))
-      
-      newX_sol = new_solution$pars[1]
-      newY_sol = new_solution$pars[2]
+      newX_sol = (setting$I[2]*setting$c[1])/setting$Px[2]
+      newY_sol = (setting$I[2]*setting$c[1])/setting$Py[1]
       
       slutskyI = x_sol*setting$Px[2] + y_sol*setting$Py[1]
       
-      hypobline <- function(x){
-        slutskyI = x[1]*setting$Px[2] + x[2]*setting$Py[1] # Hypo Budget Line
-        return(c(slutskyI))
-      }
-      
-      ssky_solution <- solnp(c(setting$seed[1], setting$seed[2]), fun = ufn, ineqfun = hypobline, ineqLB = minI, ineqUB=slutskyI, LB = c(0,0))
-      
-      ssky_x = ssky_solution$pars[1]
-      ssky_y = ssky_solution$pars[2]
+      ssky_x = (slutskyI*setting$c[1])/setting$Px[2]
+      ssky_y = (slutskyI*setting$c[1])/setting$Py[1]
       
       text <- HTML(sprintf(
         "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
@@ -374,7 +332,7 @@ server <- function(input, output, session) {
   })
   
   settingA <- reactive({ 
-    setting(input$alpha,input$Px,input$Py,input$I, x_sol, y_sol,input$hick,input$NewPx,input$NewI)
+    setting(input$alpha,input$Px,input$Py,input$I,input$hick,input$NewPx,input$NewI)
   })
   
   A <- reactive({
