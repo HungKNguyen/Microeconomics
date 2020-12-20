@@ -10,7 +10,7 @@ setting <- function(a, Px, Py, I, hick, newPx, newI) {
 consummer_optimization <- function(setting) {
   
   x_sol <- (setting$I[1]*setting$c[1])/setting$Px[1]
-  y_sol <- (setting$I[1]*setting$c[1])/setting$Py[1]
+  y_sol <- (setting$I[1]*setting$d[1])/setting$Py[1]
   
   switch(setting$hick[1],
     "NA" = {
@@ -29,7 +29,7 @@ consummer_optimization <- function(setting) {
     "Hicksian" = {
       
        newX_sol = (setting$I[2]*setting$c[1])/setting$Px[2]
-       newY_sol = (setting$I[2]*setting$c[1])/setting$Py[1]
+       newY_sol = (setting$I[2]*setting$d[1])/setting$Py[1]
        
        u = x_sol^setting$c[1]*y_sol^setting$d[1]
        
@@ -65,12 +65,12 @@ consummer_optimization <- function(setting) {
     "Slutsky" ={
       
       newX_sol = (setting$I[2]*setting$c[1])/setting$Px[2]
-      newY_sol = (setting$I[2]*setting$c[1])/setting$Py[1]
+      newY_sol = (setting$I[2]*setting$d[1])/setting$Py[1]
       
       slutskyI = x_sol*setting$Px[2] + y_sol*setting$Py[1]
       
       ssky_x = (slutskyI*setting$c[1])/setting$Px[2]
-      ssky_y = (slutskyI*setting$c[1])/setting$Py[1]
+      ssky_y = (slutskyI*setting$d[1])/setting$Py[1]
       
       text <- HTML(sprintf(
         "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
