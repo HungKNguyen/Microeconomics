@@ -18,7 +18,7 @@ consummer_optimization <- function(setting) {
     text <- HTML(sprintf(
          "<h4>Problem:</h4> Maximize &nbsp; \\(u = x^{%s}y^{%s}\\) &nbsp; &nbsp; with constraint &nbsp; \\(%s\\cdot x + %s\\cdot y = %s\\). <br/> <br/> 
           <h4>Solution:</h4> 
-          \\(x = %s \\qquad y = %s\\) <br/> <br/> <br/> <br/> <br/>",
+          \\(x = %s \\qquad y = %s\\) <br/> <br/> <br/>",
                 setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], round(x_sol, digits = 3), round(y_sol, digits = 3)
               ))
             
@@ -50,7 +50,7 @@ consummer_optimization <- function(setting) {
           \\(Income \\ Effect \\ x = %s\\) <br/>
           \\(Substitution \\ Effect \\ x = %s\\) <br/>
           \\(Income \\ Effect \\ y = %s\\) <br/>
-          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/> <br/> <br/>",
+          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/>",
          setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1],
          setting$Px[2], setting$Py[2], setting$I[2],
          round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
@@ -87,7 +87,7 @@ consummer_optimization <- function(setting) {
           \\(Income \\ Effect \\ x = %s\\) <br/>
           \\(Substitution \\ Effect \\ x = %s\\) <br/>
           \\(Income \\ Effect \\ y = %s\\) <br/>
-          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/> <br/> <br/>",
+          \\(Substitution \\ Effect \\ y = %s\\) <br/> <br/> <br/>",
         setting$c[1], setting$d[1], setting$Px[1], setting$Py[1], setting$I[1], 
         setting$Px[2], setting$Py[2], setting$I[2],
         round(x_sol, digits = 3), round(y_sol, digits = 3), round(newX_sol, digits = 3), round(newY_sol, digits = 3),
@@ -179,7 +179,7 @@ graphing <- function(solution, setting, x_scale, y_scale) {
     }
     if(setting$hick[1] == "Slutsky") {
       fig <- fig %>% add_trace(y = ~budgetline2, name = 'New Budget Constaint',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#33b34c'))
-      fig <- fig %>% add_trace(y = ~indiffcurve2, name = 'New Indifference Curve',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '91cf9d'))
+      fig <- fig %>% add_trace(y = ~indiffcurve2, name = 'New Indifference Curve',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#91cf9d'))
       fig <- fig %>% add_trace(y = ~sskyline, name = 'Slutsky Compensated Demand',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668'))
       fig <- fig %>% add_trace(y = ~indiffcurve3, name = 'Decomposition Indifference Curve',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#aadffc', dash = 'dash'))
       fig <- fig %>% add_trace(x = ~c(round(solution[3], digits =3)), y = ~c(round(solution[4], digits =3)), name = "New Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#344b38'), showlegend = FALSE)
@@ -193,6 +193,64 @@ graphing <- function(solution, setting, x_scale, y_scale) {
                      y= -0.25)
                 ),
       xaxis= list(title = "Quantity of Product X"))
+}
+
+subplots <- function(solution, setting, x_scale, y_scale, IOC_scale, POC_scale1, POC_scale2) {
+  scale <- max(c(x_scale, y_scale))
+  POC_scale <- max(c(POC_scale1, POC_scale2))
+  
+  # IOC curves
+  IOCX = function(x){(x*setting$Px[1])/setting$c[1]}
+  IOCY = function(x){(x*setting$Py[1])/setting$d[1]}
+  # POC curves
+  POCX = function(x){(setting$I[1]*setting$c[1])/x}
+  POCY = function(x){(setting$I[1]*setting$d[1])/x}
+  
+  #Create dataframe
+  x <- seq(from = 0, to = scale, length.out = 10000)
+  IOClineX <- IOCX(x)
+  IOClineY <- IOCY(x)
+  POClineX <- POCX(x)
+  POClineY <- POCY(x)
+  data <- data.frame(x, IOClineX, IOClineY, POClineX, POClineY)
+  
+  #IOCs
+  IOCs <- plot_ly(data, x = ~x)
+  IOCs <- IOCs %>% add_trace(y = ~IOClineX, name = 'Income offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa'))
+  IOCs <- IOCs %>% add_trace(y = ~IOClineY, name = 'Income offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668'))
+  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$I[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
+  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$I[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE)
+  IOCs <- IOCs %>% layout(
+    yaxis = list(title = "Income", range = c(0,IOC_scale)),
+    legend = (list(orientation = 'h',
+                   xanchor = "center",
+                   x = 0.5,
+                   y= -0.25)
+    ),
+    xaxis= list(title = "Quantity of Product X"))
+  
+  #POCs
+  POCs <- plot_ly(data, x = ~x)
+  POCs <- POCs %>% add_trace(y = ~POClineX, name = 'Price offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa'))
+  POCs <- POCs %>% add_trace(y = ~POClineY, name = 'Price offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668'), yaxis = "y2")
+  POCs <- POCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$Px[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
+  POCs <- POCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$Py[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE, yaxis = "y2")
+  POCs <- POCs %>% layout(
+    yaxis = list(title = "Price of Product X", range = c(0,POC_scale)),
+    yaxis2 = list(title = "Price of Product Y",
+                  overlaying = "y",
+                  side = "right",
+                  range = c(0,POC_scale),
+                  automargin = TRUE
+                  ),
+    legend = (list(orientation = 'h',
+                   xanchor = "center",
+                   x = 0.5,
+                   y= -0.25)
+    ),
+    xaxis= list(title = "Quantity of Products "))
+  
+  mylist <- list("IOCs" = IOCs, "POCs" = POCs)
 }
 
 # R shiny
@@ -212,7 +270,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                           tabPanel("Utility Maximization & Constraint", align = "center",
                              withMathJax(),
                              helpText(h4("Utility  \\(u(x,y)=x^\\alpha y^{1-\\alpha}\\)")),
-                             sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .5, step = 0.005),
+                             sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .3, step = 0.005),
                              
                              br(),
                              
@@ -220,7 +278,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                              
                              fluidRow(
                                column(9,
-                                  sliderInput("I", "I:",min = 0, max = 250, value = 250, step = 250/200)    
+                                  sliderInput("I", "I:",min = 0, max = 250, value = 125, step = 250/200)    
                                 ),
                                column(3,
                                   checkboxInput("settingI", "Advance Setting")
@@ -236,13 +294,13 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxI", value = 250, label = "Max I")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusI", value = 250, label = "Value of I")   
+                                      numericInput(inputId = "cusI", value = 125, label = "Value of I")   
                                )
                              ),
                              
                              fluidRow(
                                column(9,
-                                      sliderInput("Px", "\\(P_x\\):",min = 0, max = 20, value = 20, step = 20/200)    
+                                      sliderInput("Px", "\\(P_x\\):",min = 0, max = 20, value = 10, step = 20/200)    
                                ),
                                column(3,
                                       checkboxInput("settingPx", "Advance Setting")
@@ -258,13 +316,13 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxPx", value = 20, label = "Max \\(P_x\\)")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusPx", value = 20, label = "Value of \\(P_x\\)")   
+                                      numericInput(inputId = "cusPx", value = 10, label = "Value of \\(P_x\\)")   
                                )
                              ),
                              
                              fluidRow(
                                column(9,
-                                      sliderInput("Py", "\\(P_y\\):",min = 0, max = 20, value = 20, step = 20/200)   
+                                      sliderInput("Py", "\\(P_y\\):",min = 0, max = 20, value = 10, step = 20/200)   
                                ),
                                column(3,
                                       checkboxInput("settingPy", "Advance Setting") 
@@ -280,7 +338,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxPy", value = 20, label = "Max \\(P_y\\)")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusPy", value = 20, label = "Value of \\(P_y\\)")   
+                                      numericInput(inputId = "cusPy", value = 10, label = "Value of \\(P_y\\)")   
                                )
                              )
                           ),
@@ -294,7 +352,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                              
                              fluidRow(
                                column(9,
-                                      sliderInput("NewI", "\\(I'\\):",min = 0, max = 250, value = 250, step = 250/200)  
+                                      sliderInput("NewI", "\\(I'\\):",min = 0, max = 250, value = 125, step = 250/200)  
                                ),
                                column(3,
                                       checkboxInput("settingNewI", "Advance Setting") 
@@ -310,13 +368,13 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxNewI", value = 250, label = "Max I'")    
                                ),
                                column(4,
-                                      numericInput(inputId = "cusNewI", value = 250, label = "Value of I'")   
+                                      numericInput(inputId = "cusNewI", value = 125, label = "Value of I'")   
                                )
                              ),
                              
                              fluidRow(
                                column(9,
-                                      sliderInput("NewPx", "\\(P'_x\\):",min = 0, max = 40, value = 40, step = 40/200)
+                                      sliderInput("NewPx", "\\(P'_x\\):",min = 0, max = 40, value = 20, step = 40/200)
                                ),
                                column(3,
                                       checkboxInput("settingNewPx", "Advance Setting")   
@@ -332,13 +390,13 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxNewPx", value = 40, label = "Max \\(P'_x\\)")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusNewPx", value = 40, label = "Value of \\(P'_x\\)")   
+                                      numericInput(inputId = "cusNewPx", value = 20, label = "Value of \\(P'_x\\)")   
                                )
                              ),
                              
                              fluidRow(
                                column(9,
-                                      sliderInput("NewPy", "\\(P'_y\\):",min = 0, max = 20, value = 20, step = 20/200)
+                                      sliderInput("NewPy", "\\(P'_y\\):",min = 0, max = 20, value = 10, step = 20/200)
                                ),
                                column(3,
                                       checkboxInput("settingNewPy", "Advance Setting")   
@@ -354,7 +412,7 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "maxNewPy", value = 20, label = "Max \\(P'_y\\)")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusNewPy", value = 20, label = "Value of \\(P'_y\\)")   
+                                      numericInput(inputId = "cusNewPy", value = 10, label = "Value of \\(P'_y\\)")   
                                )
                              ),
                           )
@@ -365,7 +423,19 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                         plotlyOutput("graph"),
                         uiOutput("result")
                       )
-                    )
+                    ),
+                   h4("Income offer curves and Price offer curves"),
+                   
+                   fluidRow(
+                     column(6,
+                            plotlyOutput("IOCs")
+                            ),
+                     column(6,
+                            plotlyOutput("POCs")
+                            )
+                   ),
+                   br(),
+                   br()
                  )),
                  
                   tabPanel("Producer",
@@ -402,7 +472,7 @@ server <- function(input, output, session) {
     minNewI <- input$minNewI
     maxNewI <- input$maxNewI
     cusNewI <- input$cusNewI
-    updateSliderInput(session, "NewI", value = maxNewI,
+    updateSliderInput(session, "NewI", value = cusNewI,
                       min = minNewI, max = maxNewI, step = (maxNewI - minNewI)/200,)
     
     minNewPx <- input$minNewPx
@@ -449,6 +519,11 @@ server <- function(input, output, session) {
     withMathJax(
       text()
     )})
+  
+  sub <- reactive({ subplots(A()$solution, settingA(), x_scale(), y_scale(), input$maxI, input$maxPx, input$maxPy) })
+  
+  output$IOCs <- renderPlotly({sub()$IOCs})
+  output$POCs <- renderPlotly({sub()$POCs})
 }
 
 shinyApp(ui = ui, server = server)
