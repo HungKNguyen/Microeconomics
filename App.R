@@ -201,10 +201,14 @@ subplots <- function(solution, setting, x_scale, y_scale, IOC_scale, POC_scale1,
   
   # IOC curves
   IOCX = function(x){(x*setting$Px[1])/setting$c[1]}
+  NewIOCX = function(x){(x*setting$Px[2])/setting$c[1]}
   IOCY = function(x){(x*setting$Py[1])/setting$d[1]}
+  NewIOCY = function(x){(x*setting$Py[2])/setting$d[1]}
   # POC curves
   POCX = function(x){(setting$I[1]*setting$c[1])/x}
+  NewPOCX = function(x){(setting$I[2]*setting$c[1])/x}
   POCY = function(x){(setting$I[1]*setting$d[1])/x}
+  NewPOCY = function(x){(setting$I[2]*setting$d[1])/x}
   
   #Create dataframe
   x <- seq(from = 0, to = scale, length.out = 10000)
@@ -212,14 +216,25 @@ subplots <- function(solution, setting, x_scale, y_scale, IOC_scale, POC_scale1,
   IOClineY <- IOCY(x)
   POClineX <- POCX(x)
   POClineY <- POCY(x)
-  data <- data.frame(x, IOClineX, IOClineY, POClineX, POClineY)
+  NewIOClineX <- NewIOCX(x)
+  NewIOClineY <- NewIOCY(x)
+  NewPOClineX <- NewPOCX(x)
+  NewPOClineY <- NewPOCY(x)
+  data <- data.frame(x, IOClineX, IOClineY, POClineX, POClineY,
+                     NewIOClineX, NewIOClineY, NewPOClineX, NewPOClineY)
   
   #IOCs
   IOCs <- plot_ly(data, x = ~x)
   IOCs <- IOCs %>% add_trace(y = ~IOClineX, name = 'Income offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa'))
   IOCs <- IOCs %>% add_trace(y = ~IOClineY, name = 'Income offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668'))
-  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$I[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
-  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$I[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE)
+  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$I[1], digits =3)), name = "Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
+  IOCs <- IOCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$I[1], digits =3)), name = "Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE)
+  if(setting$hick[1] != "NA") {
+    IOCs <- IOCs %>% add_trace(y = ~NewIOClineX, name = 'New income offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa', dash = 'dash'))
+    IOCs <- IOCs %>% add_trace(y = ~NewIOClineY, name = 'New income offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668', dash = 'dash'))
+    IOCs <- IOCs %>% add_trace(x = ~c(round(solution[3], digits =3)), y = ~c(round(setting$I[2], digits =3)), name = "New Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#98cae3', line = list(color = '#1f4051', width =1)), showlegend = FALSE)
+    IOCs <- IOCs %>% add_trace(x = ~c(round(solution[4], digits =3)), y = ~c(round(setting$I[2], digits =3)), name = "New Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#edabac', line = list(color = '#8a3435', width =1)), showlegend = FALSE)
+  }
   IOCs <- IOCs %>% layout(
     yaxis = list(title = "Income", range = c(0,IOC_scale)),
     legend = (list(orientation = 'h',
@@ -233,8 +248,14 @@ subplots <- function(solution, setting, x_scale, y_scale, IOC_scale, POC_scale1,
   POCs <- plot_ly(data, x = ~x)
   POCs <- POCs %>% add_trace(y = ~POClineX, name = 'Price offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa'))
   POCs <- POCs %>% add_trace(y = ~POClineY, name = 'Price offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668'), yaxis = "y2")
-  POCs <- POCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$Px[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
-  POCs <- POCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$Py[1], digits =3)), type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE, yaxis = "y2")
+  POCs <- POCs %>% add_trace(x = ~c(round(solution[1], digits =3)), y = ~c(round(setting$Px[1], digits =3)), name = "Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#1f4051'), showlegend = FALSE)
+  POCs <- POCs %>% add_trace(x = ~c(round(solution[2], digits =3)), y = ~c(round(setting$Py[1], digits =3)), name = "Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#8a3435'), showlegend = FALSE, yaxis = "y2")
+  if(setting$hick[1] != "NA") {
+    POCs <- POCs %>% add_trace(y = ~NewPOClineX, name = 'New price offer curve for product X',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#66c7fa', dash = 'dash'))
+    POCs <- POCs %>% add_trace(y = ~NewPOClineY, name = 'New price offer curve for product Y',mode = 'lines', hovertemplate = "X: %{x} <br>Y: %{y}",line = list(color = '#f96668', dash = 'dash'), yaxis = "y2")
+    POCs <- POCs %>% add_trace(x = ~c(round(solution[3], digits =3)), y = ~c(round(setting$Px[2], digits =3)), name = "New Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#98cae3', line = list(color = '#1f4051', width =1)), showlegend = FALSE)
+    POCs <- POCs %>% add_trace(x = ~c(round(solution[4], digits =3)), y = ~c(round(setting$Py[2], digits =3)), name = "New Optimal Bundle", type = 'scatter', mode = 'markers', hovertemplate = "X: %{x} <br>Y: %{y}",marker = list(color = '#edabac', line = list(color = '#8a3435', width =1)), showlegend = FALSE, yaxis = "y2")
+  }
   POCs <- POCs %>% layout(
     yaxis = list(title = "Price of Product X", range = c(0,POC_scale)),
     yaxis2 = list(title = "Price of Product Y",
@@ -270,7 +291,28 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                           tabPanel("Utility Maximization & Constraint", align = "center",
                              withMathJax(),
                              helpText(h4("Utility  \\(u(x,y)=x^\\alpha y^{1-\\alpha}\\)")),
-                             sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .3, step = 0.005),
+                             
+                             fluidRow(
+                               column(9,
+                                      sliderInput("alpha", "\\(\\alpha\\):",min = 0, max = 1, value = .3, step = 1/200)    
+                               ),
+                               column(3,
+                                      checkboxInput("settingalpha", "Advance Setting")
+                               )
+                             ),
+                             
+                             conditionalPanel(
+                               condition = "input.settingalpha == true",
+                               column(4,
+                                      numericInput(inputId = "minalpha", value = 0, label = "Min \\(\\alpha\\)")
+                               ),
+                               column(4,
+                                      numericInput(inputId = "maxalpha", value = 1, label = "Max \\(\\alpha\\)")   
+                               ),
+                               column(4,
+                                      numericInput(inputId = "cusalpha", value = .3, label = "Value of \\(\\alpha\\)")   
+                               )
+                             ),
                              
                              br(),
                              
@@ -387,10 +429,10 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
                                       numericInput(inputId = "minNewPx", value = 0, label = "Min \\(P'_x\\)")
                                ),
                                column(4,
-                                      numericInput(inputId = "maxNewPx", value = 40, label = "Max \\(P'_x\\)")   
+                                      numericInput(inputId = "maxNewPx", value = 20, label = "Max \\(P'_x\\)")   
                                ),
                                column(4,
-                                      numericInput(inputId = "cusNewPx", value = 20, label = "Value of \\(P'_x\\)")   
+                                      numericInput(inputId = "cusNewPx", value = 10, label = "Value of \\(P'_x\\)")   
                                )
                              ),
                              
@@ -450,6 +492,12 @@ ui <- navbarPage("MicroEconomics by Luke and Hung",
 server <- function(input, output, session) {
   
   observe({
+    
+    minalpha <- input$minalpha
+    maxalpha <- input$maxalpha
+    cusalpha <- input$cusalpha
+    updateSliderInput(session, "alpha", value = cusalpha,
+                      min = minalpha, max = maxalpha, step = (maxalpha - minalpha)/200,)
     
     minI <- input$minI
     maxI <- input$maxI
@@ -520,7 +568,7 @@ server <- function(input, output, session) {
       text()
     )})
   
-  sub <- reactive({ subplots(A()$solution, settingA(), x_scale(), y_scale(), input$maxI, input$maxPx, input$maxPy) })
+  sub <- reactive({ subplots(A()$solution, settingA(), x_scale(), y_scale(),input$maxI, input$maxPx, input$maxPy) })
   
   output$IOCs <- renderPlotly({sub()$IOCs})
   output$POCs <- renderPlotly({sub()$POCs})
